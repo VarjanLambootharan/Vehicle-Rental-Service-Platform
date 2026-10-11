@@ -1,0 +1,27 @@
+TRAVELER-TEXT-1
+list	1
+object	12
+key	createdAt
+string	2026-10-11T07:05:15.895119300Z
+key	dismissedAt
+null
+key	eventId
+string	395bc470-c352-4a9a-b278-f37e520c1eee
+key	id
+string	ba0bdbae-0711-4cda-890a-f2bb21b51fe7
+key	message
+string	Your vehicle booking is confirmed.
+key	notificationType
+string	BOOKING_CONFIRMED
+key	read
+boolean	false
+key	readAt
+null
+key	recipientUserId
+string	7cacd8a3-4d03-41f0-afb7-f402185fac91
+key	relatedEntityId
+string	5b2d6b9a-72e4-4867-851b-4a5b386ac26a
+key	title
+string	Booking Confirmed
+key	updatedAt
+string	2026-10-11T07:05:15.895119300Z

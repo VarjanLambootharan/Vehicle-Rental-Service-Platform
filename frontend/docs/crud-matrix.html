@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Traveler · Member CRUD matrix</title>
+    <style>
+      body {
+        margin: 0;
+        background: #f7f5ef;
+        color: #29352e;
+        font:
+          14px/1.6 Arial,
+          sans-serif;
+      }
+      main {
+        max-width: 1600px;
+        margin: auto;
+        padding: 40px 5%;
+      }
+      h1,
+      h2 {
+        font-family: Georgia, serif;
+        font-weight: 400;
+      }
+      h1 {
+        font-size: 38px;
+      }
+      p {
+        max-width: 1000px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+        background: #fffefa;
+      }
+      th,
+      td {
+        text-align: left;
+        vertical-align: top;
+        border: 1px solid #d5dbcb;
+        padding: 14px;
+      }
+      th {
+        background: #29352e;
+        color: white;
+      }
+      code {
+        display: block;
+        font-size: 11px;
+        white-space: normal;
+        color: #68522e;
+      }
+      .scroll {
+        overflow: auto;
+      }
+      small {
+        color: #637157;
+      }
+      .status {
+        color: #426637;
+        font-weight: bold;
+      }
+      caption {
+        text-align: left;
+        margin: 15px 0;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <small>SE1020 · VEHICLE RENTAL SERVICE · FRONTEND DELIVERY</small>
+      <h1>Six members. Eighteen functional pages.</h1>
+      <p>
+        Base URL: <code>/api/v1</code>Each row below represents a distinct
+        module UI route. “—” means the action is not performed on that page; it
+        is not a claim of unsupported module functionality. Read the limitations
+        after the matrix. All writes use existing Spring Boot endpoints.
+      </p>
+      <div class="scroll">
+        <table>
+          <caption>
+            Required page allocation and CRUD implementation
+          </caption>
+          <thead>
+            <tr>
+              <th>Member / Module</th>
+              <th>UI page / route</th>
+              <th>Create</th>
+              <th>Read</th>
+              <th>Update</th>
+              <th>Delete / actual effect</th>
+              <th>Implementation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1 · Customer</td>
+              <td>Customer profile<code>/profile</code></td>
+              <td>—</td>
+              <td><code>GET /customers/me</code></td>
+              <td>Navigate to edit</td>
+              <td>—</td>
+              <td class="status">Connected</td>
+            </tr>
+            <tr>
+              <td>1 · Customer</td>
+              <td>Edit profile<code>/profile/edit</code></td>
+              <td>—</td>
+              <td><code>GET /customers/me</code></td>
+              <td><code>PUT /customers/me</code></td>
+              <td>Deactivate account<code>DELETE /customers/me</code></td>
+              <td class="status">Connected</td>
+            </tr>
+            <tr>
+              <td>1 · Customer</td>
+              <td>Customer administration<code>/admin/customers</code></td>
+              <td>—</td>
+              <td>
+                <code>GET /customers?q</code><code>GET /customers/{id}</code>
+              </td>
+              <td>
+                Activate/reactivate<code>PATCH /customers/{id}/active</code>
+              </td>
+              <td>Deactivate via same PATCH; retains history</td>
+              <td class="status">Connected</td>
+            </tr>
+            <tr>
+              <td>2 · Vehicle</td>
+              <td>Vehicle catalogue<code>/vehicles</code></td>
+              <td>—</td>
+              <td>
+                <code
+                  >GET
+                  /vehicles?q&amp;type&amp;minimumPassengers&amp;pickupDate&amp;returnDate</code
+                >
+              </td>
+              <td>Admin link to edit</td>
+              <td>—</td>
+              <td class="status">Connected</td>
+            </tr>
+            <tr>
+              <td>2 · Vehicle</td>
+              <td>Add vehicle<code>/admin/vehicles/new</code></td>
+              <td><code>POST /vehicles</code></td>
+              <td>—</td>
+              <td>—</td>
+              <td>—</td>
+              <td class="status">Connected</td>
+            </tr>
+            <tr>
+              <td>2 · Vehicle</td>
+              <td>Edit vehicle<code>/admin/vehicles/{id}/edit</code></td>
+              <td>—</td>
+              <td><code>GET /vehicles/{id}</code></td>
+              <td>
+                <code>PUT /vehicles/{id}</code
+                ><code>PATCH /vehicles/{id}/status</code>
+              </td>
+              <td>Deactivate<code>DELETE /vehicles/{id}</code></td>
+              <td class="status">Connected</td>
+            </tr>
+            <tr>
+              <td>3 · Booking</td>
+              <td>Create booking<code>/bookings/new</code></td>
+              <td><code>POST /bookings</code></td>
+              <td>
+                Date-filtered vehicles<code
+                  >GET /vehicles?pickupDate&amp;returnDate</code
+                >
+              </td>
+              <td>—</td>
+              <td>—</td>
+              <td class="status">Connected</td>
+            </tr>
+            <tr>
+              <td>3 · Booking</td>
+              <td>My bookings<code>/bookings</code></td>
+              <td>Link to create</td>
+              <td>
+                <code>GET /bookings/me</code><code>GET /payments/me</code
+                ><code>GET /vehicles</code>
+              </td>
+              <td>Details page edits dates<code>PUT /bookings/{id}</code></td>
+              <td>
+                Cancel / resume cancellation<code>DELETE /bookings/{id}</code>
+              </td>
+              <td class="status">Connected</td>
+            </tr>
+            <tr>
+              <td>3 · Booking</td>
+              <td>Booking administration<code>/admin/bookings</code></td>
+              <td>—</td>
+              <td>
+                <code>GET /bookings</code><code>GET /payments</code
+                ><code>GET /vehicles</code>
+              </td>
+              <td>Start/complete<code>PATCH /bookings/{id}/status</code></td>
+              <td>Cancel eligible booking<code>DELETE /bookings/{id}</code></td>
+              <td class="status">Connected</td>
+            </tr>
+            <tr>
+              <td>4 · Payment</td>
+              <td>Make payment<code>/payments/new</code></td>
+              <td><code>POST /payments</code></td>
+              <td>
+                <code>GET /bookings/me</code><code>GET /payments/me</code
+                ><code>GET /vehicles</code>
+              </td>
+              <td>—</td>
+              <td>—</td>
+              <td class="status">Connected</td>
+            </tr>
+            <tr>
+              <td>4 · Payment</td>
+              <td>Payment history<code>/payments</code></td>
+              <td>Link to payment</td>
+              <td>
+                <code>GET /payments/me</code><code>GET /bookings/me</code>Detail
+                link<code>GET /payments/{id}</code>
+              </td>
+              <td>—</td>
+              <td>—</td>
+              <td class="status">Connected</td>
+            </tr>
+            <tr>
+              <td>4 · Payment</td>
+              <td>Payment administration<code>/admin/payments</code></td>
+              <td>—</td>
+              <td><code>GET /payments</code><code>GET /bookings</code></td>
+              <td>
+                Pending → paid/failed<code>PATCH /payments/{id}/status</code>
+              </td>
+              <td>
+                Void eligible pending payment<code>DELETE /payments/{id}</code>
+              </td>
+              <td class="status">Connected</td>
+            </tr>
+            <tr>
+              <td>5 · Maintenance</td>
+              <td>Add maintenance<code>/admin/maintenance/new</code></td>
+              <td><code>POST /maintenance</code></td>
+              <td><code>GET /vehicles</code></td>
+              <td>—</td>
+              <td>—</td>
+              <td class="status">Connected</td>
+            </tr>
+            <tr>
+              <td>5 · Maintenance</td>
+              <td>Maintenance records<code>/admin/maintenance</code></td>
+              <td>Link to create</td>
+              <td>
+                <code>GET /maintenance?q&amp;vehicleId</code
+                ><code>GET /vehicles</code>
+              </td>
+              <td>Link to manage record</td>
+              <td>—</td>
+              <td class="status">Connected</td>
+            </tr>
+            <tr>
+              <td>5 · Maintenance</td>
+              <td>Edit maintenance<code>/admin/maintenance/{id}/edit</code></td>
+              <td>—</td>
+              <td>
+                <code>GET /maintenance/{id}</code><code>GET /vehicles</code>
+              </td>
+              <td>
+                Scheduled details; start/complete<code
+                  >PUT /maintenance/{id}</code
+                >
+              </td>
+              <td>
+                Cancel scheduled maintenance<code
+                  >DELETE /maintenance/{id}</code
+                >
+              </td>
+              <td class="status">Connected</td>
+            </tr>
+            <tr>
+              <td>6 · Reviews</td>
+              <td>Submit review<code>/reviews/new</code></td>
+              <td><code>POST /reviews</code></td>
+              <td>
+                Eligible completed bookings<code>GET /bookings/me</code
+                ><code>GET /reviews/me</code><code>GET /vehicles</code>
+              </td>
+              <td>—</td>
+              <td>—</td>
+              <td class="status">Connected</td>
+            </tr>
+            <tr>
+              <td>6 · Reviews</td>
+              <td>My reviews<code>/reviews</code></td>
+              <td>Link to submit</td>
+              <td>
+                <code>GET /reviews/me</code><code>GET /reviews/{id}</code
+                ><code>GET /vehicles</code>
+              </td>
+              <td>Owner edit page<code>PUT /reviews/{id}</code></td>
+              <td>Permanent soft-hide<code>DELETE /reviews/{id}</code></td>
+              <td class="status">Connected</td>
+            </tr>
+            <tr>
+              <td>6 · Reviews</td>
+              <td>Review moderation<code>/admin/reviews</code></td>
+              <td>—</td>
+              <td>
+                Includes hidden records<code>GET /reviews</code
+                ><code>GET /reviews/{id}</code><code>GET /vehicles</code>
+              </td>
+              <td>Admin editing unsupported</td>
+              <td>Permanent soft-hide<code>DELETE /reviews/{id}</code></td>
+              <td class="status">Connected</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <h2>Additional authentication, shared and detail pages</h2>
+      <p>
+        Customer create is <code>POST /auth/register</code>on the additional
+        Registration page, which does not count among the three member pages.
+        Login uses <code>POST /auth/login</code>and session bootstrap uses
+        <code>GET /auth/me</code>. Other additional screens include home,
+        customer/admin dashboards, vehicle details, booking details/date edit,
+        payment details, review edit, fleet administration, notifications,
+        forbidden and not-found pages.
+      </p>
+      <h2>Unsupported operations are not marked complete</h2>
+      <ul>
+        <li>
+          No admin-side customer creation/profile edit, password change/reset,
+          refresh tokens or server token revocation.
+        </li>
+        <li>
+          No physical deletion for customers, vehicles, bookings, payments,
+          maintenance or reviews; the UI uses accurate lifecycle labels.
+        </li>
+        <li>
+          No standalone refund, real gateway, credit-card capture or
+          payment-amount editing.
+        </li>
+        <li>
+          No maintenance vehicle reassignment or editing completed/in-progress
+          details. Transitions follow the backend model.
+        </li>
+        <li>
+          No review restoration, multiple reviews per booking or administrator
+          comment editing.
+        </li>
+        <li>
+          No media upload, pickup-location selection, server pagination,
+          blocked-date calendar or statistics endpoints. See README for frontend
+          handling.
+        </li>
+      </ul>
+      <p>
+        “Connected” describes implemented source/API integration. Actual test
+        coverage and any outstanding verification limits are recorded separately
+        in <a href="verification.md">verification.md</a>.
+      </p>
+    </main>
+  </body>
+</html>

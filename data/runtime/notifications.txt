@@ -1,0 +1,52 @@
+TRAVELER-TEXT-1
+list	2
+object	12
+key	createdAt
+string	2026-10-11T07:05:15.895119300Z
+key	dismissedAt
+null
+key	eventId
+string	395bc470-c352-4a9a-b278-f37e520c1eee
+key	id
+string	ba0bdbae-0711-4cda-890a-f2bb21b51fe7
+key	message
+string	Your vehicle booking is confirmed.
+key	notificationType
+string	BOOKING_CONFIRMED
+key	read
+boolean	true
+key	readAt
+string	2026-10-11T08:08:29.894154800Z
+key	recipientUserId
+string	7cacd8a3-4d03-41f0-afb7-f402185fac91
+key	relatedEntityId
+string	5b2d6b9a-72e4-4867-851b-4a5b386ac26a
+key	title
+string	Booking Confirmed
+key	updatedAt
+string	2026-10-11T08:08:29.894154800Z
+object	12
+key	createdAt
+string	2026-10-11T07:05:20.219286900Z
+key	dismissedAt
+null
+key	eventId
+string	03b62c03-c5f1-403b-87d1-18647034f27e
+key	id
+string	c38d1035-20e7-4743-bc23-6b3d8e04dab6
+key	message
+string	Your cash-on-pickup payment is pending. No payment has been received.
+key	notificationType
+string	PAYMENT_RECORDED
+key	read
+boolean	true
+key	readAt
+string	2026-10-11T08:08:29.915926700Z
+key	recipientUserId
+string	7cacd8a3-4d03-41f0-afb7-f402185fac91
+key	relatedEntityId
+string	9ec99132-dcf7-4425-9cf2-d2a16094ce97
+key	title
+string	Payment Recorded
+key	updatedAt
+string	2026-10-11T08:08:29.915926700Z

@@ -1,0 +1,12 @@
+package com.se1020.vehiclerental.notification;
+
+public enum NotificationType {
+  BOOKING_CONFIRMED,
+  BOOKING_CANCELLED,
+  PAYMENT_RECORDED,
+  PAYMENT_PAID,
+  PAYMENT_FAILED,
+  RENTAL_STARTED,
+  RENTAL_COMPLETED,
+  REVIEW_SUBMITTED
+}
