@@ -1,0 +1,54 @@
+@startuml
+!pragma layout smetana
+title Member 6 — reviews
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam classBackgroundColor #F1F5F9
+skinparam ArrowColor #475569
+hide empty members
+
+class Review {
+  -customerId : UUID
+-vehicleId : UUID
+-bookingId : UUID
+-rating : int
+-comment : String
+-deletedAt : Instant
++edit()
++hide()
+}
+abstract class EventEntity {
+  +getEvents()
+}
+class ReviewController
+class ReviewService {
+  +create()
++list()
++get()
++mine()
++update()
++delete()
+}
+class ReviewRepository
+class BookingRepository
+class NotificationService
+class StorageCoordinator
+class Booking
+class Customer
+class Vehicle
+EventEntity <|-- Review
+ReviewController ..> ReviewService
+ReviewService ..> ReviewRepository
+ReviewService ..> BookingRepository : completion and ownership
+ReviewService ..> NotificationService
+ReviewService ..> StorageCoordinator
+ReviewRepository ..> Review : reviews.txt
+Review "0..1" --> "1" Booking : bookingId (including hidden review)
+Review "0..*" --> "1" Customer : customerId
+Review "0..*" --> "1" Vehicle : vehicleId
+note bottom of Review
+Soft deletion retains the record and uniqueness.
+Public queries hide deleted reviews.
+end note
+
+@enduml

@@ -1,0 +1,71 @@
+@startuml
+!pragma layout smetana
+title Shared notifications — persistent events and tombstones
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam classBackgroundColor #F1F5F9
+skinparam ArrowColor #475569
+hide empty members
+
+abstract class EventEntity {
+  -events : List<NotificationEvent>
++getEvents()
+#recordEvent()
+}
+class NotificationEvent <<record>> {
+  +eventId() : UUID
++recipientUserId() : UUID
++notificationType() : NotificationType
++relatedEntityId() : UUID
+}
+class Booking
+class Payment
+class Review
+class Notification {
+  -eventId : UUID
+-recipientUserId : UUID
+-read : boolean
+-readAt : Instant
+-dismissedAt : Instant
++markRead()
++dismiss()
+}
+class NotificationController
+class NotificationService {
+  +deliverPending()
++list()
++unreadCount()
++markRead()
++markAllRead()
++dismiss()
++dismissAll()
+}
+class NotificationRepository
+class BookingRepository
+class PaymentRepository
+class ReviewRepository
+class StorageCoordinator
+class RecoveryRunner {
+  +run()
++retry()
+}
+EventEntity <|-- Booking
+EventEntity <|-- Payment
+EventEntity <|-- Review
+EventEntity *-- "0..*" NotificationEvent
+NotificationController ..> NotificationService
+NotificationService ..> NotificationRepository
+NotificationService ..> BookingRepository
+NotificationService ..> PaymentRepository
+NotificationService ..> ReviewRepository
+NotificationService ..> StorageCoordinator
+NotificationService ..> NotificationEvent : reads saved source events
+NotificationRepository ..> Notification : notifications.txt
+Notification ..> NotificationEvent : eventId deduplication
+RecoveryRunner ..> NotificationService
+note bottom of Notification
+Dismissal retains eventId and dismissedAt.
+Retry never recreates a dismissed notification.
+end note
+
+@enduml

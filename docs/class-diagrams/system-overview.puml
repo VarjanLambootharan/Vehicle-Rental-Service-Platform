@@ -1,0 +1,88 @@
+@startuml
+!pragma layout smetana
+title Vehicle Rental Service Platform — domain overview
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam classBackgroundColor #F1F5F9
+skinparam ArrowColor #475569
+hide empty members
+
+abstract class Entity {
+  -id : UUID
+}
+abstract class EventEntity {
+  +getEvents()
+}
+abstract class User {
+  +getRole()
+}
+class Customer
+class Admin
+abstract class Vehicle {
+  +passengerCapacity()
++rentalGuidance()
+}
+class Car
+class Motorcycle
+class VehicleCatalogue {
+  +search()
+}
+class Booking {
+  +blocksDates()
++requestCancellation()
++finishCancellation()
+}
+class RentalPeriod <<record>> {
+  +days()
++overlaps()
+}
+class CancellationWorkflow
+class Payment {
+  +transitionPending()
++settleCancellation()
+}
+class MaintenanceRecord {
+  +transition()
++blocks()
+}
+class Review {
+  +edit()
++hide()
+}
+class NotificationEvent <<record>>
+class Notification {
+  +markRead()
++dismiss()
+}
+Entity <|-- User
+Entity <|-- Vehicle
+Entity <|-- EventEntity
+Entity <|-- MaintenanceRecord
+Entity <|-- Notification
+User <|-- Customer
+User <|-- Admin
+Vehicle <|-- Car
+Vehicle <|-- Motorcycle
+VehicleCatalogue o-- "0..*" Vehicle : independently persisted
+EventEntity <|-- Booking
+EventEntity <|-- Payment
+EventEntity <|-- Review
+EventEntity *-- "0..*" NotificationEvent : persisted source events
+Booking *-- "1" RentalPeriod
+Booking *-- "0..1" CancellationWorkflow
+Booking "0..*" --> "1" Customer : customerId
+Booking "0..*" --> "1" Vehicle : vehicleId
+Payment "0..*" --> "1" Booking : bookingId
+MaintenanceRecord "0..*" --> "1" Vehicle : vehicleId
+Review "0..1" --> "1" Booking : bookingId
+Review "0..*" --> "1" Customer : customerId
+Review "0..*" --> "1" Vehicle : vehicleId
+Notification "0..*" --> "1" User : recipientUserId
+Notification ..> NotificationEvent : delivered eventId
+note bottom of Booking
+Associations use UUID fields, not embedded objects.
+Each feature has Controller → Service → Repository.
+All repositories use TextFileStore and StorageCoordinator.
+end note
+
+@enduml
