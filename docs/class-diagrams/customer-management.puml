@@ -1,0 +1,80 @@
+@startuml
+!pragma layout smetana
+title Member 1 — customer management and authentication
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam classBackgroundColor #F1F5F9
+skinparam ArrowColor #475569
+hide empty members
+
+abstract class User {
+  -fullName : String
+-email : String
+-passwordHash : String
+-active : boolean
++getRole()
+}
+class Customer {
+  +updateProfile()
++activate()
++deactivate()
+}
+class Admin {
+  +getRole()
+}
+class CustomerController
+class CustomerService {
+  +me()
++list()
++get()
++update()
++deactivateMe()
++active()
+}
+class CustomerRepository {
+  +findByEmail()
+}
+class AuthController
+class AuthService {
+  +register()
++login()
++me()
+}
+class AdminInitializer {
+  +run()
+}
+class TokenService {
+  +issue()
+}
+class Access {
+  +current()
++customer()
++admin()
+}
+class CustomUserDetailsService {
+  +loadUserByUsername()
+}
+class BookingRepository
+abstract class TextRepository
+class TextFileStore
+User <|-- Customer
+User <|-- Admin
+CustomerController ..> CustomerService : constructor injection
+CustomerService ..> CustomerRepository
+CustomerService ..> BookingRepository : deactivation guard
+CustomerService ..> Access
+AuthController ..> AuthService
+AuthService ..> CustomerRepository
+AuthService ..> TokenService
+AuthService ..> Access
+AdminInitializer ..> CustomerRepository
+CustomUserDetailsService ..> CustomerRepository
+TextRepository <|-- CustomerRepository
+TextRepository ..> TextFileStore
+CustomerRepository ..> User : users.txt
+note bottom of User
+DTOs exclude passwordHash.
+Role comes from the subtype and current stored user.
+end note
+
+@enduml

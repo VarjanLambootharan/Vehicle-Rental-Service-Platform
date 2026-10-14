@@ -1,0 +1,21 @@
+TRAVELER-TEXT-1
+list	1
+object	9
+key	type
+string	ADMIN
+key	id
+string	6312184a-06cd-4e6f-88f5-d6d7efc26531
+key	createdAt
+string	2026-10-10T07:18:12.122099800Z
+key	updatedAt
+string	2026-10-10T07:18:12.122099800Z
+key	fullName
+string	Administrator
+key	email
+string	admin@example.com
+key	passwordHash
+string	$2a$12$kG4UEK7ChB1ziMXroFPGneUv9oPV1VtKMpL68kE6PfxytWeUhyftW
+key	phone
+string	
+key	active
+boolean	true
