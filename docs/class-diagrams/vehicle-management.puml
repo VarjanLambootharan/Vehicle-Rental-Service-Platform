@@ -1,0 +1,67 @@
+@startuml
+!pragma layout smetana
+title Member 2 — vehicles and catalogue
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam classBackgroundColor #F1F5F9
+skinparam ArrowColor #475569
+hide empty members
+
+abstract class Vehicle {
+  -registrationNumber : String
+-dailyRate : BigDecimal
+-status : VehicleStatus
++updateDetails()
++changeAdministrativeStatus()
++passengerCapacity()
++rentalGuidance()
+}
+class Car {
+  -seats : int
+-transmission : String
++updateCar()
++passengerCapacity()
++rentalGuidance()
+}
+class Motorcycle {
+  -engineCapacityCc : int
++updateMotorcycle()
++passengerCapacity()
++rentalGuidance()
+}
+class VehicleCatalogue {
+  +search()
+}
+class VehicleController
+class VehicleService {
+  +list()
++get()
++create()
++update()
++status()
+}
+class AvailabilityService {
+  +available()
++requireAvailable()
++requireNoProtectedBookings()
+}
+class VehicleRepository
+class BookingRepository
+class MaintenanceRepository
+abstract class TextRepository
+class TextFileStore
+Vehicle <|-- Car
+Vehicle <|-- Motorcycle
+VehicleCatalogue o-- "0..*" Vehicle
+VehicleController ..> VehicleService
+VehicleService ..> VehicleCatalogue : creates grouping
+VehicleService ..> AvailabilityService
+VehicleService ..> VehicleRepository
+AvailabilityService ..> VehicleRepository
+AvailabilityService ..> BookingRepository
+AvailabilityService ..> MaintenanceRepository
+TextRepository <|-- VehicleRepository
+TextRepository ..> TextFileStore
+VehicleRepository ..> Vehicle : vehicles.txt
+
+@enduml
