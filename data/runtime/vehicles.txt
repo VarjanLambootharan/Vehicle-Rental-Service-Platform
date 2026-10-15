@@ -1,0 +1,27 @@
+TRAVELER-TEXT-1
+list	1
+object	12
+key	type
+string	CAR
+key	brand
+string	volvo
+key	createdAt
+string	2026-10-11T07:04:27.407521500Z
+key	dailyRate
+number	12000
+key	description
+string	it is expensive but worth it
+key	id
+string	192fdb5f-f951-4859-9102-ff828b6b8aaf
+key	model
+string	g7
+key	registrationNumber
+string	ABC123
+key	seats
+number	4
+key	status
+string	AVAILABLE
+key	transmission
+string	manual
+key	updatedAt
+string	2026-10-11T07:04:27.407521500Z
