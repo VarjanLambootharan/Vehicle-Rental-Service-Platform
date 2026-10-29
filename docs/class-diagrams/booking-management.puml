@@ -1,0 +1,74 @@
+@startuml
+!pragma layout smetana
+title Member 3 — bookings and cancellation
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam classBackgroundColor #F1F5F9
+skinparam ArrowColor #475569
+hide empty members
+
+class Booking {
+  -customerId : UUID
+-vehicleId : UUID
+-dailyRateSnapshot : BigDecimal
+-totalAmount : BigDecimal
+-status : BookingStatus
++modifyDates()
++start()
++complete()
++requestCancellation()
++finishCancellation()
+}
+class RentalPeriod <<record>> {
+  +pickupDate() : LocalDate
++returnDate() : LocalDate
++days()
++overlaps()
++contains()
+}
+class CancellationWorkflow {
+  -workflowId : UUID
+-originalPaymentId : UUID
+-requiredPaymentAction : PaymentAction
+-state : State
+}
+class BookingController
+class BookingService {
+  +create()
++update()
++status()
+}
+class CancellationService {
+  +cancel()
++recoverPending()
+}
+class BookingRepository
+class PaymentRepository
+class VehicleRepository
+class AvailabilityService
+class NotificationService
+class StorageCoordinator {
+  +locked()
+}
+class RecoveryRunner
+Booking *-- "1" RentalPeriod
+Booking *-- "0..1" CancellationWorkflow
+BookingController ..> BookingService
+BookingController ..> CancellationService
+BookingService ..> BookingRepository
+BookingService ..> AvailabilityService
+BookingService ..> StorageCoordinator
+CancellationService ..> BookingRepository
+CancellationService ..> PaymentRepository
+CancellationService ..> VehicleRepository
+CancellationService ..> StorageCoordinator
+CancellationService ..> NotificationService
+RecoveryRunner ..> CancellationService
+BookingRepository ..> Booking : bookings.txt
+note bottom of CancellationWorkflow
+REQUESTED intent is persisted before payment changes.
+Pending bookings continue blocking dates.
+COMPLETED is saved with the final cancellation event.
+end note
+
+@enduml
