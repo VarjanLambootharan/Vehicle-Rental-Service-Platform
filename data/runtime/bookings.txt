@@ -1,0 +1,46 @@
+TRAVELER-TEXT-1
+list	1
+object	12
+key	cancellationWorkflow
+null
+key	cancelledAt
+null
+key	createdAt
+string	2026-10-11T07:05:15.863400100Z
+key	customerId
+string	7cacd8a3-4d03-41f0-afb7-f402185fac91
+key	dailyRateSnapshot
+number	12000
+key	events
+list	1
+object	7
+key	createdAt
+string	2026-10-11T07:05:15.865636600Z
+key	eventId
+string	395bc470-c352-4a9a-b278-f37e520c1eee
+key	message
+string	Your vehicle booking is confirmed.
+key	notificationType
+string	BOOKING_CONFIRMED
+key	recipientUserId
+string	7cacd8a3-4d03-41f0-afb7-f402185fac91
+key	relatedEntityId
+string	5b2d6b9a-72e4-4867-851b-4a5b386ac26a
+key	title
+string	Booking Confirmed
+key	id
+string	5b2d6b9a-72e4-4867-851b-4a5b386ac26a
+key	rentalPeriod
+object	2
+key	pickupDate
+string	2026-10-11
+key	returnDate
+string	2026-10-12
+key	status
+string	CONFIRMED
+key	totalAmount
+number	12000
+key	updatedAt
+string	2026-10-11T07:05:15.863400100Z
+key	vehicleId
+string	192fdb5f-f951-4859-9102-ff828b6b8aaf
