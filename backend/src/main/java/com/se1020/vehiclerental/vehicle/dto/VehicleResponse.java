@@ -31,9 +31,15 @@ public record VehicleResponse(
         v.getDailyRate(),
         v.getDescription(),
         v.getStatus(),
-        v instanceof com.se1020.vehiclerental.vehicle.Car c ? c.getSeats() : null,
-        v instanceof com.se1020.vehiclerental.vehicle.Car c ? c.getTransmission() : null,
-        v instanceof com.se1020.vehiclerental.vehicle.Motorcycle m ? m.getEngineCapacityCc() : null,
+        v instanceof com.se1020.vehiclerental.vehicle.ConfigurablePassengerVehicle p
+            ? p.getSeats()
+            : null,
+        v instanceof com.se1020.vehiclerental.vehicle.ConfigurablePassengerVehicle p
+            ? p.getTransmission()
+            : null,
+        v instanceof com.se1020.vehiclerental.vehicle.EngineVehicle e
+            ? e.getEngineCapacityCc()
+            : null,
         v.passengerCapacity(),
         v.rentalGuidance(),
         v.getCreatedAt(),

@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import java.time.*;
 
 public record VehicleRequest(
-    @NotBlank @Pattern(regexp = "CAR|MOTORCYCLE") String type,
+    @NotBlank @Pattern(regexp = "CAR|VAN|MOTORCYCLE|THREE_WHEELER") String type,
     @NotBlank @Size(max = 30) String registrationNumber,
     @NotBlank @Size(max = 80) String brand,
     @NotBlank @Size(max = 80) String model,
