@@ -55,13 +55,11 @@ public class BookingService {
               var period = new RentalPeriod(request.pickupDate(), request.returnDate());
               period.requireNotPast(clock);
               availability.requireAvailable(request.vehicleId(), period, null);
-              return BookingResponse.from(
+              var vehicle = vehicles.require(request.vehicleId());
+              return response(
                   bookings.save(
-                      new Booking(
-                          customer,
-                          request.vehicleId(),
-                          period,
-                          vehicles.require(request.vehicleId()).getDailyRate())));
+                      new Booking(customer, request.vehicleId(), period, vehicle.getDailyRate())),
+                  vehicle);
             });
     notifications.deliverPending();
     return result;
@@ -71,19 +69,19 @@ public class BookingService {
     UUID id = access.customer().getId();
     return bookings.findAll().stream()
         .filter(b -> b.getCustomerId().equals(id))
-        .map(BookingResponse::from)
+        .map(this::response)
         .toList();
   }
 
   public List<BookingResponse> all() {
     access.admin();
-    return bookings.findAll().stream().map(BookingResponse::from).toList();
+    return bookings.findAll().stream().map(this::response).toList();
   }
 
   public BookingResponse get(UUID id) {
     var b = bookings.require(id);
     access.ownerOrAdmin(b.getCustomerId());
-    return BookingResponse.from(b);
+    return response(b);
   }
 
   public BookingResponse update(UUID id, BookingDatesRequest request) {
@@ -106,7 +104,7 @@ public class BookingService {
           period.requireNotPast(clock);
           availability.requireAvailable(b.getVehicleId(), period, id);
           b.modifyDates(period);
-          return BookingResponse.from(bookings.save(b));
+          return response(bookings.save(b));
         });
   }
 
@@ -131,12 +129,30 @@ public class BookingService {
                 availability.requireAvailable(b.getVehicleId(), b.getRentalPeriod(), id);
                 b.start();
               } else if (status == BookingStatus.COMPLETED) b.complete();
-              else
+              else if (status == BookingStatus.NO_SHOW) {
+                // Paid simulated payments remain as history. Pending cash obligations are voided.
+                b.noShow(clock);
+                for (var p : payments.findAll()) {
+                  if (p.getBookingId().equals(id) && p.getStatus() == PaymentStatus.PENDING) {
+                    p.transitionPending(PaymentStatus.VOIDED);
+                    payments.save(p);
+                  }
+                }
+              } else
                 throw new BusinessException(
                     "BOOKING_STATE", "Use the cancellation endpoint or a valid rental transition");
-              return BookingResponse.from(bookings.save(b));
+              return response(bookings.save(b));
             });
     notifications.deliverPending();
     return result;
+  }
+
+  private BookingResponse response(Booking booking) {
+    return response(booking, vehicles.require(booking.getVehicleId()));
+  }
+
+  private static BookingResponse response(
+      Booking booking, com.se1020.vehiclerental.vehicle.Vehicle vehicle) {
+    return BookingResponse.from(booking, vehicle);
   }
 }

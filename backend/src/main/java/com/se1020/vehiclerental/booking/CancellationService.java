@@ -52,7 +52,8 @@ public class CancellationService {
             () -> {
               var b = bookings.require(id);
               access.ownerOrAdmin(b.getCustomerId());
-              if (b.getStatus() == BookingStatus.CANCELLED) return BookingResponse.from(b);
+              if (b.getStatus() == BookingStatus.CANCELLED)
+                return BookingResponse.from(b, vehicles.require(b.getVehicleId()));
               if (b.getStatus() != BookingStatus.CANCELLATION_PENDING) {
                 require(
                     b.getStatus() == BookingStatus.CONFIRMED
@@ -83,10 +84,11 @@ public class CancellationService {
                 bookings.save(b); // Durable intent precedes every payment modification.
               }
               try {
-                return BookingResponse.from(resume(id));
+                var resolved = resume(id);
+                return BookingResponse.from(resolved, vehicles.require(resolved.getVehicleId()));
               } catch (StorageException e) {
                 LOG.warn("Cancellation {} is durably pending and will be retried", id);
-                return BookingResponse.from(b);
+                return BookingResponse.from(b, vehicles.require(b.getVehicleId()));
               }
             });
     notifications.deliverPending();
@@ -104,10 +106,13 @@ public class CancellationService {
     String title = "Booking Cancelled",
         message =
             "Your booking has been cancelled. No payment was made, so no refund was required.";
+    java.math.BigDecimal refundAmount = null;
     if (workflow.getRequiredPaymentAction() != CancellationWorkflow.PaymentAction.NONE) {
       var p = payments.require(workflow.getOriginalPaymentId());
       require(
           p.getBookingId().equals(id)
+              && p.getCustomerId().equals(b.getCustomerId())
+              && workflow.getOriginalPaymentAmount() != null
               && p.getAmount().compareTo(workflow.getOriginalPaymentAmount()) == 0,
           "CANCELLATION_INTEGRITY",
           "Cancellation payment reference or amount mismatch");
@@ -122,6 +127,7 @@ public class CancellationService {
             "CANCELLATION_INTEGRITY",
             "Workflow payment state mismatch");
       if (refund) {
+        refundAmount = p.getAmount();
         var vehicle = vehicles.require(b.getVehicleId());
         title = "Booking Cancelled — Refund Completed";
         message =
@@ -137,7 +143,7 @@ public class CancellationService {
             "Your booking has been cancelled. Your pending payment was voided. No refund was"
                 + " required.";
     }
-    b.finishCancellation(title, message);
+    b.finishCancellation(title, message, refundAmount);
     return bookings.save(b);
   }
 

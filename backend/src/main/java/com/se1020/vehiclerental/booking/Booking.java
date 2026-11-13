@@ -47,6 +47,16 @@ public final class Booking extends EventEntity {
     touch();
   }
 
+  public void noShow(Clock clock) {
+    require(
+        status == BookingStatus.CONFIRMED
+            && !rentalPeriod.returnDate().isAfter(LocalDate.now(clock)),
+        "BOOKING_STATE",
+        "Only expired confirmed bookings can be resolved as no-show");
+    status = BookingStatus.NO_SHOW;
+    touch();
+  }
+
   public void start() {
     require(
         status == BookingStatus.CONFIRMED, "BOOKING_STATE", "Only confirmed bookings can start");
@@ -78,6 +88,11 @@ public final class Booking extends EventEntity {
   }
 
   public void finishCancellation(String title, String message) {
+    finishCancellation(title, message, null);
+  }
+
+  /** The refund event commits with completed cancellation, after durable payment settlement. */
+  public void finishCancellation(String title, String message, BigDecimal refundAmount) {
     require(
         status == BookingStatus.CANCELLATION_PENDING,
         "BOOKING_STATE",
@@ -87,6 +102,16 @@ public final class Booking extends EventEntity {
     cancelledAt = Instant.now();
     touch();
     recordEvent(customerId, NotificationType.BOOKING_CANCELLED, title, message);
+    if (refundAmount != null)
+      recordEvent(
+          customerId,
+          NotificationType.SIMULATED_REFUND_COMPLETED,
+          "Demo Refund Completed",
+          "Your booking has been cancelled. A simulated refund of LKR "
+              + refundAmount.toPlainString()
+              + " has been completed for booking "
+              + getId()
+              + ". No actual bank transfer has occurred.");
   }
 
   public UUID getCustomerId() {
@@ -119,5 +144,12 @@ public final class Booking extends EventEntity {
 
   public CancellationWorkflow getCancellationWorkflow() {
     return cancellationWorkflow;
+  }
+
+  /** The deletion receipt preserves settlement facts before retiring the payment reference. */
+  public void retireCancellationPayment() {
+    require(status == BookingStatus.CANCELLED, "BOOKING_STATE", "Cancellation must be settled");
+    cancellationWorkflow = null;
+    touch();
   }
 }
