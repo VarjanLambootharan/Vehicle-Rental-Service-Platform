@@ -1,11 +1,8 @@
 package com.se1020.vehiclerental.vehicle;
 
-import static com.se1020.vehiclerental.common.exception.BusinessException.require;
-
 import java.math.BigDecimal;
 
-public final class Motorcycle extends Vehicle {
-  private int engineCapacityCc;
+public final class Motorcycle extends EngineVehicle {
 
   private Motorcycle() {}
 
@@ -21,9 +18,7 @@ public final class Motorcycle extends Vehicle {
   }
 
   public void updateMotorcycle(int cc) {
-    require(cc >= 50 && cc <= 2500, "INVALID_MOTORCYCLE", "Engine capacity must be 50–2500 cc");
-    engineCapacityCc = cc;
-    touch();
+    updateEngineCapacity(cc, "MOTORCYCLE");
   }
 
   @Override
@@ -39,11 +34,7 @@ public final class Motorcycle extends Vehicle {
   @Override
   public String rentalGuidance() {
     return "Motorcycle licence for "
-        + engineCapacityCc
+        + getEngineCapacityCc()
         + " cc required; helmets required for rider and passenger.";
-  }
-
-  public int getEngineCapacityCc() {
-    return engineCapacityCc;
   }
 }

@@ -1,12 +1,8 @@
 package com.se1020.vehiclerental.vehicle;
 
-import static com.se1020.vehiclerental.common.exception.BusinessException.require;
-
 import java.math.BigDecimal;
 
-public final class Car extends Vehicle {
-  private int seats;
-  private String transmission;
+public final class Car extends ConfigurablePassengerVehicle {
 
   private Car() {}
 
@@ -23,13 +19,7 @@ public final class Car extends Vehicle {
   }
 
   public void updateCar(int seats, String transmission) {
-    require(
-        seats >= 2 && seats <= 9 && transmission != null && !transmission.isBlank(),
-        "INVALID_CAR",
-        "A car needs 2–9 seats and a transmission");
-    this.seats = seats;
-    this.transmission = transmission;
-    touch();
+    updatePassengerConfiguration(seats, transmission, 2, 9, "CAR");
   }
 
   @Override
@@ -38,24 +28,11 @@ public final class Car extends Vehicle {
   }
 
   @Override
-  public int passengerCapacity() {
-    return seats;
-  }
-
-  @Override
   public String rentalGuidance() {
     return "Car licence required; maximum "
-        + seats
+        + getSeats()
         + " occupants; "
-        + transmission
+        + getTransmission()
         + " transmission.";
-  }
-
-  public int getSeats() {
-    return seats;
-  }
-
-  public String getTransmission() {
-    return transmission;
   }
 }

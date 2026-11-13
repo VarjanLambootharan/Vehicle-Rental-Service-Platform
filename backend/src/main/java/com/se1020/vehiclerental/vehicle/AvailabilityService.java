@@ -31,7 +31,8 @@ public class AvailabilityService {
                 b.getVehicleId().equals(vehicleId)
                     && !b.getId().equals(excludedBooking)
                     && b.blocksDates()
-                    && b.getRentalPeriod().overlaps(period))) return false;
+                    && (b.getStatus() == com.se1020.vehiclerental.booking.BookingStatus.ACTIVE
+                        || b.getRentalPeriod().overlaps(period)))) return false;
     return maintenance.findAll().stream()
         .noneMatch(m -> m.getVehicleId().equals(vehicleId) && m.blocks(period));
   }
