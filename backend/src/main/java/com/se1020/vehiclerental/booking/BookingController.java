@@ -4,6 +4,7 @@ import com.se1020.vehiclerental.booking.dto.BookingDatesRequest;
 import com.se1020.vehiclerental.booking.dto.BookingRequest;
 import com.se1020.vehiclerental.booking.dto.BookingResponse;
 import com.se1020.vehiclerental.booking.dto.BookingStatusRequest;
+import com.se1020.vehiclerental.deletion.*;
 import jakarta.validation.Valid;
 import java.util.*;
 import org.springframework.http.*;
@@ -15,10 +16,12 @@ import org.springframework.web.bind.annotation.*;
 public class BookingController {
   private final BookingService service;
   private final CancellationService cancellations;
+  private final HardDeletionService deletions;
 
-  public BookingController(BookingService service, CancellationService cancellations) {
+  public BookingController(BookingService service, CancellationService cancellations, HardDeletionService deletions) {
     this.service = service;
     this.cancellations = cancellations;
+    this.deletions = deletions;
   }
 
   @PostMapping
@@ -46,14 +49,17 @@ public class BookingController {
     return service.update(id, request);
   }
 
-  @DeleteMapping("/{id}")
+  @PatchMapping("/{id}/cancel")
   public ResponseEntity<BookingResponse> cancel(@PathVariable UUID id) {
-    var result = cancellations.cancel(id);
-    return ResponseEntity.status(
-            result.status() == BookingStatus.CANCELLATION_PENDING
-                ? HttpStatus.ACCEPTED
-                : HttpStatus.OK)
-        .body(result);
+    BookingResponse result = cancellations.cancel(id);
+    return result.status() == BookingStatus.CANCELLATION_PENDING
+        ? ResponseEntity.status(HttpStatus.ACCEPTED).body(result)
+        : ResponseEntity.ok(result);
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    return DeletionController.response(deletions.booking(id));
   }
 
   @GetMapping
