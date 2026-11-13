@@ -3,6 +3,7 @@ package com.se1020.vehiclerental.notification;
 import com.se1020.vehiclerental.booking.BookingRepository;
 import com.se1020.vehiclerental.common.storage.StorageCoordinator;
 import com.se1020.vehiclerental.common.storage.StorageException;
+import com.se1020.vehiclerental.deletion.HardDeletionService;
 import com.se1020.vehiclerental.notification.dto.NotificationResponse;
 import com.se1020.vehiclerental.payment.PaymentRepository;
 import com.se1020.vehiclerental.review.ReviewRepository;
@@ -19,6 +20,7 @@ public class NotificationService {
   private final ReviewRepository reviews;
   private final StorageCoordinator coordinator;
   private final Access access;
+  private final HardDeletionService deletions;
 
   public NotificationService(
       NotificationRepository notifications,
@@ -26,13 +28,15 @@ public class NotificationService {
       PaymentRepository payments,
       ReviewRepository reviews,
       StorageCoordinator coordinator,
-      Access access) {
+      Access access,
+      HardDeletionService deletions) {
     this.notifications = notifications;
     this.bookings = bookings;
     this.payments = payments;
     this.reviews = reviews;
     this.coordinator = coordinator;
     this.access = access;
+    this.deletions = deletions;
   }
 
   private static final org.slf4j.Logger LOG =
@@ -49,8 +53,10 @@ public class NotificationService {
             reviews.findAll().forEach(r -> events.addAll(r.getEvents()));
             Set<UUID> delivered = new HashSet<>();
             notifications.findAll().forEach(n -> delivered.add(n.getEventId()));
+            var pending = new ArrayList<Notification>();
             for (var event : events)
-              if (delivered.add(event.eventId())) notifications.save(new Notification(event));
+              if (delivered.add(event.eventId())) pending.add(new Notification(event));
+            notifications.saveAll(pending);
           });
     } catch (StorageException e) {
       LOG.warn("Notification delivery deferred; persisted events will be retried");
@@ -81,13 +87,7 @@ public class NotificationService {
   }
 
   public void dismiss(UUID id) {
-    coordinator.locked(
-        () -> {
-          var n = notifications.require(id);
-          access.owner(n.getRecipientUserId());
-          n.dismiss();
-          notifications.save(n);
-        });
+    deletions.notification(id);
   }
 
   public void markAllRead() {
@@ -95,19 +95,23 @@ public class NotificationService {
   }
 
   public void dismissAll() {
-    all(true);
+    deletions.notifications();
   }
 
   private void all(boolean dismiss) {
     coordinator.locked(
         () -> {
           UUID owner = access.current().getId();
+          var changed = new ArrayList<Notification>();
           for (var n : notifications.findAll())
-            if (n.getRecipientUserId().equals(owner) && n.getDismissedAt() == null) {
+            if (n.getRecipientUserId().equals(owner)
+                && n.getDismissedAt() == null
+                && (dismiss || !n.isRead())) {
               if (dismiss) n.dismiss();
               else n.markRead();
-              notifications.save(n);
+              changed.add(n);
             }
+          notifications.saveAll(changed);
         });
   }
 }

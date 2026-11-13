@@ -6,7 +6,10 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class NotificationRepository extends TextRepository<Notification> {
+  private final TextFileStore store;
   public NotificationRepository(TextFileStore store) {
     super(store, "notifications", Notification.class);
+    this.store = store;
   }
+  public boolean hasSnapshot(Notification notification) { return store.hasNotificationSnapshot(notification); }
 }
