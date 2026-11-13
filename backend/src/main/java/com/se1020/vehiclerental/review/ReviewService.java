@@ -6,6 +6,7 @@ import com.se1020.vehiclerental.booking.BookingRepository;
 import com.se1020.vehiclerental.booking.BookingStatus;
 import com.se1020.vehiclerental.common.exception.ResourceNotFoundException;
 import com.se1020.vehiclerental.common.storage.StorageCoordinator;
+import com.se1020.vehiclerental.deletion.HardDeletionService;
 import com.se1020.vehiclerental.notification.NotificationService;
 import com.se1020.vehiclerental.review.dto.ReviewRequest;
 import com.se1020.vehiclerental.review.dto.ReviewResponse;
@@ -22,18 +23,21 @@ public class ReviewService {
   private final StorageCoordinator coordinator;
   private final Access access;
   private final NotificationService notifications;
+  private final HardDeletionService deletions;
 
   public ReviewService(
       ReviewRepository reviews,
       BookingRepository bookings,
       StorageCoordinator coordinator,
       Access access,
-      NotificationService notifications) {
+      NotificationService notifications,
+      HardDeletionService deletions) {
     this.reviews = reviews;
     this.bookings = bookings;
     this.coordinator = coordinator;
     this.access = access;
     this.notifications = notifications;
+    this.deletions = deletions;
   }
 
   public List<ReviewResponse> list(UUID vehicleId) {
@@ -103,13 +107,17 @@ public class ReviewService {
         });
   }
 
-  public void delete(UUID id) {
-    coordinator.locked(
+  public ReviewResponse hide(UUID id) {
+    return coordinator.locked(
         () -> {
+          access.admin();
           var r = reviews.require(id);
-          access.ownerOrAdmin(r.getCustomerId());
           r.hide();
-          reviews.save(r);
+          return ReviewResponse.from(reviews.save(r));
         });
+  }
+
+  public void delete(UUID id) {
+    deletions.review(id);
   }
 }

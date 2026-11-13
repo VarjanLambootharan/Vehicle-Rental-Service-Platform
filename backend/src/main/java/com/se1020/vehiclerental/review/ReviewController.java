@@ -3,6 +3,7 @@ package com.se1020.vehiclerental.review;
 import com.se1020.vehiclerental.review.dto.ReviewRequest;
 import com.se1020.vehiclerental.review.dto.ReviewResponse;
 import com.se1020.vehiclerental.review.dto.ReviewUpdateRequest;
+import com.se1020.vehiclerental.deletion.*;
 import jakarta.validation.Valid;
 import java.util.*;
 import org.springframework.http.*;
@@ -13,9 +14,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/reviews")
 public class ReviewController {
   private final ReviewService service;
+  private final HardDeletionService deletions;
 
-  public ReviewController(ReviewService service) {
+  public ReviewController(ReviewService service, HardDeletionService deletions) {
     this.service = service;
+    this.deletions = deletions;
   }
 
   @GetMapping
@@ -48,9 +51,14 @@ public class ReviewController {
     return service.update(id, request);
   }
 
+  @PatchMapping("/{id}/hide")
+  @PreAuthorize("hasRole('ADMIN')")
+  public ReviewResponse hide(@PathVariable UUID id) {
+    return service.hide(id);
+  }
+
   @DeleteMapping("/{id}")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void delete(@PathVariable UUID id) {
-    service.delete(id);
+  public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    return DeletionController.response(deletions.review(id));
   }
 }

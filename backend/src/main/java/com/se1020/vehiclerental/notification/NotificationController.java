@@ -2,6 +2,7 @@ package com.se1020.vehiclerental.notification;
 
 import com.se1020.vehiclerental.notification.dto.NotificationResponse;
 import com.se1020.vehiclerental.notification.dto.UnreadCountResponse;
+import com.se1020.vehiclerental.deletion.*;
 import java.util.*;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -10,9 +11,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/notifications")
 public class NotificationController {
   private final NotificationService service;
+  private final HardDeletionService deletions;
 
-  public NotificationController(NotificationService service) {
+  public NotificationController(NotificationService service, HardDeletionService deletions) {
     this.service = service;
+    this.deletions = deletions;
   }
 
   @GetMapping
@@ -37,14 +40,12 @@ public class NotificationController {
   }
 
   @DeleteMapping("/{id}")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void dismiss(@PathVariable UUID id) {
-    service.dismiss(id);
+  public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    return DeletionController.response(deletions.notification(id));
   }
 
   @DeleteMapping
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void dismissAll() {
-    service.dismissAll();
+  public ResponseEntity<Void> deleteAll() {
+    return DeletionController.response(deletions.notifications());
   }
 }
